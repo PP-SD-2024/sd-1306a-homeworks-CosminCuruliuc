@@ -29,7 +29,7 @@
 
         <!-- Formular pentru actualizare inforamtii! -->
         <br />
-        <h3>Modificati datele pentru actualizarea informatiilor: </h3>
+        <h3>Modificati datele pentru actualizarea informatiilor sau stergerea acestora: </h3>
         <form action="./update-student" method="post">
             Nume: <input type="text" name="nume" value='<jsp:getProperty name="studentBean" property="nume" />'/>
             <br />
@@ -39,5 +39,10 @@
             <br />
             <button type="submit">Actualizare</button>
         </form>
+
+        <form action="./delete-student" method="post">
+            <button type="submit">Sterge Student</button>
+        </form>
+
     </body>
 </html>

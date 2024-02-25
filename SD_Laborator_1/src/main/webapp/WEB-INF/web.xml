@@ -24,6 +24,11 @@
     <servlet-class>UpdateStudentServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>DeleteStudent</servlet-name>
+    <servlet-class>DeleteStudentServlet</servlet-class>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>Hello</servlet-name>
     <url-pattern>/hello</url-pattern>
@@ -42,6 +47,11 @@
   <servlet-mapping>
     <servlet-name>UpdateStudent</servlet-name>
     <url-pattern>/update-student</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>DeleteStudent</servlet-name>
+    <url-pattern>/delete-student</url-pattern>
   </servlet-mapping>
 
 </web-app>
