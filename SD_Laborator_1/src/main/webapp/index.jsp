@@ -1,15 +1,9 @@
 <html>
     <body>
-        <h2>Hello World!</h2>
+        <h2>Baza de date pentru studentii facultatii de AC</h2>
         <br />
         <p>
-            <a href="./hello">Acces la primul servlet</a>
-        </p>
-        <p>
-            <a href="./formular.jsp">Formular student</a>
-        </p>
-        <p>
-            <a href="./read-student">Vizualizare student</a>
+            <a href="./add-student.jsp">Adaugare student</a>
         </p>
     </body>
 </html>
