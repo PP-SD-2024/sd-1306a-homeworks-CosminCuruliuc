@@ -1,34 +1,41 @@
 import beans.StudentBean;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
-import java.time.Year;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReadStudentServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException{ // deserializare student din fisierul XML de pe disc
-        File file = new File("/home/student/IdeaProjects/sd-1306a-homeworks-CosminCuruliuc/SD_Laborator_1/student.xml");
-        // se returneaza un raspuns HTTP de tip 404 in cazul incarenu se gaseste fisierul cu date
-        if (!file.exists()) {
-            response.sendError(404, "Nu a fost gasit niciun student serializat pe disc!");
-            return;
-        }
-        XmlMapper xmlMapper = new XmlMapper();
-        StudentBean bean = xmlMapper.readValue(file,
-                StudentBean.class);
-        request.setAttribute("nume", bean.getNume());
-        request.setAttribute("prenume", bean.getPrenume());
-        request.setAttribute("varsta", bean.getVarsta());
-        int anCurent = Year.now().getValue();
-        int anNastere = anCurent - bean.getVarsta();
-        request.setAttribute("anNastere", anNastere);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<StudentBean> students = new ArrayList<>();
+        String sql = "SELECT * FROM students";
 
-        // redirectionare date catre pagina de afisare a informatiilor studentului
-        request.getRequestDispatcher("./info-student.jsp").forward(request, response);
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                StudentBean student = new StudentBean();
+                student.setNume(rs.getString("nume"));
+                student.setPrenume(rs.getString("prenume"));
+                student.setVarsta(rs.getInt("varsta"));
+                students.add(student);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Gestionați excepția corespunzător
+        }
+
+        request.setAttribute("students", students);
+        request.getRequestDispatcher("/view-students.jsp").forward(request, response);
     }
 }
