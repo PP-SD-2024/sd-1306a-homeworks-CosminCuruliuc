@@ -33,7 +33,7 @@ public class ProcessStudentServlet extends HttpServlet {
         bean.setVarsta(varsta);
 
         // serializare bean sub forma de string XML
-        mapper.writeValue(new File("/home/student/IdeaProjects/SD_Laborator_1/student.xml"), bean);
+        mapper.writeValue(new File("/home/student/IdeaProjects/sd-1306a-homeworks-CosminCuruliuc/SD_Laborator_1/student.xml"), bean);
 
         // se trimit datele primite si anul nasterii catre o alta pagina JSP pentru afisare
         request.setAttribute("nume", nume);

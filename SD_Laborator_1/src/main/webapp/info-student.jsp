@@ -16,7 +16,7 @@
             <li>Nume: <jsp:getProperty name="studentBean" property="nume" /></li>
             <li>Prenume: <jsp:getProperty name="studentBean" property="prenume" /></li>
             <li>Varsta: <jsp:getProperty name="studentBean" property="varsta" /></li>
-            <<!-- anul nasterii nu face parte din bean, il afisam separat (daca exista) -->
+            <!-- anul nasterii nu face parte din bean, il afisam separat (daca exista) -->
              <li>Anul nasterii: <%
              Object anNastere = request.getAttribute("anNastere");
              if (anNastere != null) {
@@ -26,5 +26,18 @@
              }
              %></li>
         </ul>
+
+        <!-- Formular pentru actualizare inforamtii! -->
+        <br />
+        <h3>Modificati datele pentru actualizarea informatiilor: </h3>
+        <form action="./update-student" method="post">
+            Nume: <input type="text" name="nume" value='<jsp:getProperty name="studentBean" property="nume" />'/>
+            <br />
+            Prenume: <input type="text" name="prenume" value='<jsp:getProperty name="studentBean" property="prenume" />'/>
+            <br />
+            Varsta: <input type="number" name="varsta" value='<jsp:getProperty name="studentBean" property="varsta" />'/>
+            <br />
+            <button type="submit">Actualizare</button>
+        </form>
     </body>
 </html>

@@ -6,15 +6,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.time.Year;
 
 public class ReadStudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException{ // deserializare student din fisierul XML de pe disc
-        File file = new File("/home/student/IdeaProjects/SD_Laborator_1/student.xml");
+        File file = new File("/home/student/IdeaProjects/sd-1306a-homeworks-CosminCuruliuc/SD_Laborator_1/student.xml");
         // se returneaza un raspuns HTTP de tip 404 in cazul incarenu se gaseste fisierul cu date
         if (!file.exists()) {
-            response.sendError(404, "Nu a fost gasit niciun studentserializat pe disc!");
+            response.sendError(404, "Nu a fost gasit niciun student serializat pe disc!");
             return;
         }
         XmlMapper xmlMapper = new XmlMapper();
@@ -23,6 +24,9 @@ public class ReadStudentServlet extends HttpServlet {
         request.setAttribute("nume", bean.getNume());
         request.setAttribute("prenume", bean.getPrenume());
         request.setAttribute("varsta", bean.getVarsta());
+        int anCurent = Year.now().getValue();
+        int anNastere = anCurent - bean.getVarsta();
+        request.setAttribute("anNastere", anNastere);
 
         // redirectionare date catre pagina de afisare a informatiilor studentului
         request.getRequestDispatcher("./info-student.jsp").forward(request, response);
