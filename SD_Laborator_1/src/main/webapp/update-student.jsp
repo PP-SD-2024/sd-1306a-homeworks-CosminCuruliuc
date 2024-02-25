@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Actualizați un Student</title>
+    <title>Actualizati un Student</title>
 </head>
 <body>
     <h2>Formular pentru actualizarea datelor unui student</h2>
@@ -15,7 +15,7 @@
         <br />
         Varsta Nouă: <input type="number" name="varsta" />
         <br />
-        <button type="submit">Actualizează Student</button>
+        <button type="submit">Actualizeaza Student</button>
     </form>
 </body>
 </html>
