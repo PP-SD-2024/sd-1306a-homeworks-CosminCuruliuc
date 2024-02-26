@@ -14,5 +14,8 @@
         <p>
             <a href="./delete-student.jsp">Stergere student</a>
         </p>
+        <p>
+            <a href="exportDatabase">Exportati baza de data ca JSON</a>
+        </p>
     </body>
 </html>

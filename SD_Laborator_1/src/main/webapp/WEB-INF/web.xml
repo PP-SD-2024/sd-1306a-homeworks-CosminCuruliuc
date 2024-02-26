@@ -25,6 +25,11 @@
     <servlet-class>DeleteStudentServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>ExportDatabase</servlet-name>
+    <servlet-class>ExportDatabaseServlet</servlet-class>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>ProcessStudent</servlet-name>
     <url-pattern>/process-student</url-pattern>
@@ -43,6 +48,11 @@
   <servlet-mapping>
     <servlet-name>DeleteStudent</servlet-name>
     <url-pattern>/delete-student</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>ExportDatabase</servlet-name>
+    <url-pattern>/exportDatabase</url-pattern>
   </servlet-mapping>
 
 </web-app>
