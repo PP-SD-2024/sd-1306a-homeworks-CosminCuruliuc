@@ -30,6 +30,11 @@
     <servlet-class>ExportDatabaseServlet</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>SearchStudent</servlet-name>
+    <servlet-class>SearchStudentServlet</servlet-class>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>ProcessStudent</servlet-name>
     <url-pattern>/process-student</url-pattern>
@@ -53,6 +58,11 @@
   <servlet-mapping>
     <servlet-name>ExportDatabase</servlet-name>
     <url-pattern>/exportDatabase</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SearchStudent</servlet-name>
+    <url-pattern>/search-student</url-pattern>
   </servlet-mapping>
 
 </web-app>

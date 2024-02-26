@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 public class DeleteStudentServlet extends HttpServlet {
-    // Asumăm că ștergem după ID
+    // Asumam ca stergem după ID
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
