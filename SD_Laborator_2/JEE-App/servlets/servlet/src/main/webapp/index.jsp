@@ -31,5 +31,7 @@
 		<a href="./fetch-student-list">Afisare lista studenti</a>
 		<br />
         <a href="./search-student-for-update.jsp">Actualizare student</a>
+        <br />
+        <a href="./search-student-for-delete.jsp">Stergere student</a>
 	</body>
 </html>
