@@ -29,5 +29,7 @@
 		<a href="./formular.jsp">Adaugare student</a>
 		<br />
 		<a href="./fetch-student-list">Afisare lista studenti</a>
+		<br />
+        <a href="./search-student-for-update.jsp">Actualizare student</a>
 	</body>
 </html>

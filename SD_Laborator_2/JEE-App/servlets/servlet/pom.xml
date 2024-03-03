@@ -26,6 +26,7 @@
       <artifactId>javaee-api</artifactId>
       <version>8.0.1</version>
       <scope>provided</scope>
+
     </dependency>
     <dependency>
       <groupId>com.sd.laborator</groupId>
@@ -33,4 +34,16 @@
       <type>ejb</type>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>7</source>
+          <target>7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
