@@ -32,6 +32,14 @@
         <servlet-name>DeleteStudent</servlet-name>
         <servlet-class>DeleteStudentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MonitorServlet</servlet-name>
+        <servlet-class>MonitorServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ErrorCheckingServlet</servlet-name>
+        <servlet-class>ErrorCheckingServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>ProcessBankOperation</servlet-name>
@@ -60,5 +68,13 @@
     <servlet-mapping>
         <servlet-name>DeleteStudent</servlet-name>
         <url-pattern>/delete-student</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MonitorServlet</servlet-name>
+        <url-pattern>/monitor</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ErrorCheckingServlet</servlet-name>
+        <url-pattern>/checkError</url-pattern>
     </servlet-mapping>
 </web-app>

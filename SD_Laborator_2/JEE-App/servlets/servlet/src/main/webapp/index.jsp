@@ -33,5 +33,35 @@
         <a href="./search-student-for-update.jsp">Actualizare student</a>
         <br />
         <a href="./search-student-for-delete.jsp">Stergere student</a>
+
+        <br />
+        <h3>Monitorizare Vârstă Studenți</h3>
+        <form action="monitor" method="get">
+           <fieldset>
+           <legend>Setați limitele de vârstă pentru monitorizare:</legend>
+           Limita inferioară (a): <input type="number" name="a" required>
+           <br /><br />
+           Limita superioară (b): <input type="number" name="b" required>
+           <br /><br />
+           <button type="submit">Inițiază Monitorizarea</button>
+           </fieldset>
+        </form>
+
+                <script>
+                    function checkForErrors() {
+                        fetch('checkError')
+                            .then(response => response.text())
+                            .then(text => {
+                                if (text) {
+                                    alert("Eroare detectată: " + text);
+                                    // Opțional: Redirecționează către o pagină de eroare detaliată
+                                    // window.location.href = "/errorPage.jsp";
+                                }
+                            })
+                            .catch(error => console.error('Eroare la verificarea erorilor:', error));
+                    }
+
+                    setInterval(checkForErrors, 5000); // Verifică la fiecare 5 secunde
+                </script>
 	</body>
 </html>
