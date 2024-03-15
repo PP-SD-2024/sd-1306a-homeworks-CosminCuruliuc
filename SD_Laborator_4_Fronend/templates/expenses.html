@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Expenses</title>
+</head>
+<body>
+    <h1>Your Expenses</h1>
+    <a href="/expenses/add">Add New Expense</a>
+    <ul>
+        {% for expense in expenses %}
+        <li>{{ expense.date }} - {{ expense.category }}: {{ expense.amount }} - {{ expense.description }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
