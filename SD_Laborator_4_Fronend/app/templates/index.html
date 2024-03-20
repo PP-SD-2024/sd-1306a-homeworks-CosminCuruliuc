@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to the Expense Tracker</h1>
+{% if session.username %}
+    <p>Hello, {{ session.username }}!</p>
+    <a href="{{ url_for('main.logout') }}">Logout</a> |
+    <a href="{{ url_for('main.add_expense') }}">Add New Expense</a>
+
+    <h2>Your Expenses</h2>
+    <ul>
+        {% for expense in expenses %}
+            <li>{{ expense.category }}: {{ expense.amount }} - {{ expense.date }}</li>
+        {% else %}
+            <li>No expenses recorded</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <a href="{{ url_for('main.login') }}">Login</a> |
+    <a href="{{ url_for('main.register') }}">Register</a>
+{% endif %}
+{% endblock %}

@@ -1,30 +1,26 @@
 package com.laborator.sd_laborator_4.model
 
-import java.util.*
 import jakarta.persistence.*
+import java.math.BigDecimal
+import java.util.Date
 
 @Entity
 @Table(name = "expenses")
-data class Expense(
+class Expense(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false)
-    var amount: Double,
+    val category: String,
 
     @Column(nullable = false)
-    var description: String,
+    val amount: BigDecimal,
 
-    @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    var date: Date,
+    val date: Date,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    var user: User,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    var category: ExpenseCategory
+    @JoinColumn(name = "user_id")
+    val user: User
 )

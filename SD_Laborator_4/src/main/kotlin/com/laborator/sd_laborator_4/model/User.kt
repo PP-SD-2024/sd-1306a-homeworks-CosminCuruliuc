@@ -1,26 +1,32 @@
 package com.laborator.sd_laborator_4.model
 
 import jakarta.persistence.*
+import java.util.*
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 @Entity
 @Table(name = "users")
-data class User(
+class User(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
     @Column(nullable = false, unique = true)
-    var username: String,
+    val username: String,
 
     @Column(nullable = false)
-    var password: String,
+    private var password: String,
 
     @Column(nullable = false)
-    var firstName: String,
+    val firstName: String,
 
     @Column(nullable = false)
-    var lastName: String,
+    val lastName: String,
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    var expenses: List<Expense> = emptyList()
-)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val expenses: MutableList<Expense> = mutableListOf()
+) {
+
+    fun getPassword(): String = this.password
+}
