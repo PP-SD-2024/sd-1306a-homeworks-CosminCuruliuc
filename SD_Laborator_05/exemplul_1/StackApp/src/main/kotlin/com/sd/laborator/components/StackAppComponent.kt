@@ -15,10 +15,6 @@ class StackAppComponent {
     private var B: Stack? = null
 
     @Autowired
-    private lateinit var primeGenerator: PrimeNumberGenerator
-    @Autowired
-    private lateinit var cartesianProductOperation: CartesianProductOperation
-    @Autowired
     private lateinit var unionOperation: UnionOperation
     @Autowired
     private lateinit var connectionFactory: RabbitMqConnectionFactoryComponent
@@ -53,37 +49,26 @@ class StackAppComponent {
             msg)
     }
 
-    private fun generateStack(count: Int): Stack? {
-        if (count < 1)
-            return null
-        var X: MutableSet<Int> = mutableSetOf()
-        while (X.count() < count)
-            X.add(primeGenerator.generatePrimeNumber())
-        return Stack(X)
-    }
-
     private fun computeExpression(): String {
         if (A == null)
-            A = generateStack(20)
+            A = unionOperation.generateStack(20)
         if (B == null)
-            B = generateStack(20)
+            B = unionOperation.generateStack(20)
         if (A!!.data.count() == B!!.data.count()) {
             // (A x B) U (B x B)
-            val partialResult1 = cartesianProductOperation.executeOperation(A!!.data, B!!.data)
-            val partialResult2 = cartesianProductOperation.executeOperation(B!!.data, B!!.data)
-            val result = unionOperation.executeOperation(partialResult1, partialResult2)
+            val result = unionOperation.executeOperation(A!!.data, B!!.data)
             return "compute~" + "{\"A\": \"" + A?.data.toString() +"\", \"B\": \"" + B?.data.toString() + "\", \"result\": \"" + result.toString() + "\"}"
         }
         return "compute~" + "Error: A.count() != B.count()"
     }
 
     private fun regenerateA(): String {
-        A = generateStack(20)
+        A = unionOperation.generateStack(20)
         return "A~" + A?.data.toString()
     }
 
     private fun regenerateB(): String {
-        B = generateStack(20)
+        B = unionOperation.generateStack(20)
         return "B~" + B?.data.toString()
     }
 }
