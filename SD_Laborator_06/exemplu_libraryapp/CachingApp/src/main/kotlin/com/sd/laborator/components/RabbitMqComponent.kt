@@ -1,4 +1,4 @@
-package com.sd.laborator.presentation.config
+package com.sd.laborator.components
 
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+
 @Component
 class RabbitMqComponent {
     @Value("\${spring.rabbitmq.host}")

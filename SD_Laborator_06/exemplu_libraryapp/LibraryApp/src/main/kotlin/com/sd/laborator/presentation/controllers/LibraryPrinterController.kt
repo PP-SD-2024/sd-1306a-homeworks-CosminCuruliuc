@@ -25,7 +25,6 @@ class LibraryPrinterController {
     @Autowired
     private lateinit var rabbitMqComponent: RabbitMqComponent
 
-    @Autowired
     private lateinit var amqpTemplate: AmqpTemplate
 
     @Autowired
@@ -73,14 +72,13 @@ class LibraryPrinterController {
             println("This operation is fresh")
             return pairAnalyzer.second
         }
-        var result: String
-        if (author != "")
-            result = this._libraryPrinterService.printJSON(this._libraryDAOService.findAllByAuthor(author).toSet())
+        val result: String = if (author != "")
+            this._libraryPrinterService.printJSON(this._libraryDAOService.findAllByAuthor(author).toSet())
         else if (title != "")
-            result = this._libraryPrinterService.printJSON(this._libraryDAOService.findAllByTitle(title).toSet())
+            this._libraryPrinterService.printJSON(this._libraryDAOService.findAllByTitle(title).toSet())
         else if (publisher != "")
-            result = this._libraryPrinterService.printJSON(this._libraryDAOService.findAllByPublisher(publisher).toSet())
-        else result =  "Not a valid field"
+            this._libraryPrinterService.printJSON(this._libraryDAOService.findAllByPublisher(publisher).toSet())
+        else "Not a valid field"
 
         sendMessage("__insert__~~__query__==$rabbitQuery;;__result__==$result")
         val receivedInsertionMessage = receiveMessage()
@@ -102,7 +100,7 @@ class LibraryPrinterController {
             println("This operation is fresh")
             return pairAnalyzer.second
         }
-        var result: String
+        val result: String
         val lambdaFunction =  when(format) {
             "html" -> _libraryPrinterService::printHTML
             "json" -> _libraryPrinterService::printJSON
@@ -124,8 +122,7 @@ class LibraryPrinterController {
         return result
     }
 
-    fun isQueryFresh(parameters: String) : Pair<Boolean, String>{
-        println(parameters)
+    private fun isQueryFresh(parameters: String) : Pair<Boolean, String>{
         if (parameters == "invalid_request" || parameters == "empty_result" || parameters == "not_succesful_operation") {
             return Pair(false, "null")
         }
@@ -143,42 +140,31 @@ class LibraryPrinterController {
                 queryResult = item.split(delimiter_2)[1]
             }
         }
-        println("time = $time")
-        println("QueryResult = $queryResult")
-        try {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val dateTime = LocalDateTime.parse(time, formatter)
-            val now = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val dateTime = LocalDateTime.parse(time, formatter)
+        val now = LocalDateTime.now()
 
-            val hours: Long = dateTime.until(now, ChronoUnit.HOURS)
-            if (hours < 1) {
-                return Pair(true, queryResult ?: "null")
-            }
-        } catch (e: Exception) {
-
+        val hours: Long = dateTime.until(now, ChronoUnit.HOURS)
+        if (hours < 1) {
+            return Pair(true, queryResult ?: "null")
         }
         return Pair(false, "null")
     }
 
     fun receiveMessage() : String {
         var msg = this.amqpTemplate.receive("library.queue")
-        //if queue is empty receive will get null
         while (msg == null){
             msg = this.amqpTemplate.receive("library.queue")
         }
-        println(msg.body)
         val processed_msg = (msg.body.map { it.toInt().toChar() }).joinToString(separator = "")
         return processed_msg
     }
 
     fun clearQueue() {
         while(this.amqpTemplate.receive("library.queue") != null);
-        println("Cleared Queue")
     }
 
     fun sendMessage(msg: String) : String{
-        println("message: $msg")
         return this.amqpTemplate.convertAndSend(rabbitMqComponent.getExchange(), rabbitMqComponent.getRoutingKey(), msg).toString()
     }
-
 }

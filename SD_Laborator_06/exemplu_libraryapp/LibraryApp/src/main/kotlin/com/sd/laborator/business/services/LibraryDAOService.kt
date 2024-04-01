@@ -23,7 +23,6 @@ class BookRowMapper : RowMapper<Book> {
 class LibraryDAOService: ILibraryDAOService {
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
-    var pattern: Pattern = Pattern.compile("\\W")
 
     override fun createBookTable() {
         jdbcTemplate.execute("""CREATE TABLE "books" ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `author` VARCHAR, `text` TEXT, `title` VARCHAR, `publisher` VARCHAR, UNIQUE(author, title, publisher, text) );""")
@@ -38,26 +37,14 @@ class LibraryDAOService: ILibraryDAOService {
     }
 
     override fun findAllByAuthor(author: String): List<Book> {
-        if(pattern.matcher(author).find()) {
-            println("SQL Injection for book author")
-            return emptyList()
-        }
         return jdbcTemplate.query("SELECT * FROM books WHERE upper(author) LIKE '%${author.uppercase(Locale.getDefault())}%'", BookRowMapper())
     }
 
     override fun findAllByTitle(title: String): List<Book> {
-        if(pattern.matcher(title).find()) {
-            println("SQL Injection for book title")
-            return emptyList()
-        }
         return jdbcTemplate.query("SELECT * FROM books WHERE upper(title) LIKE '%${title.uppercase(Locale.getDefault())}%'", BookRowMapper())
     }
 
     override fun findAllByPublisher(publisher: String): List<Book> {
-        if(pattern.matcher(publisher).find()) {
-            println("SQL Injection for book publisher")
-            return emptyList()
-        }
         return jdbcTemplate.query("SELECT * FROM books WHERE upper(publisher) LIKE '%${publisher.uppercase(Locale.getDefault())}%'", BookRowMapper())
     }
 }
