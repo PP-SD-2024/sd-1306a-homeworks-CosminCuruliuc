@@ -1,6 +1,14 @@
 package com.sd.laborator.business.models
 
-class Book(private var data: Content) {
+class Book(private var id: Int, private var data: Content) {
+
+    var bookID: Int
+        get() {
+            return id
+        }
+        set(value) {
+            id = value
+        }
 
     var name: String?
         get() {

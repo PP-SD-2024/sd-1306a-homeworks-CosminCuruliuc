@@ -16,9 +16,9 @@ class RabbitMqComponent {
     private lateinit var username: String
     @Value("\${spring.rabbitmq.password}")
     private lateinit var password: String
-    @Value("\${beerapp.rabbitmq.exchange}")
+    @Value("\${library.rabbitmq.exchange}")
     private lateinit var exchange: String
-    @Value("\${beerapp.rabbitmq.routingkey}")
+    @Value("\${library.rabbitmq.routingkey}")
     private lateinit var routingKey: String
     fun getExchange(): String = this.exchange
     fun getRoutingKey(): String = this.routingKey
