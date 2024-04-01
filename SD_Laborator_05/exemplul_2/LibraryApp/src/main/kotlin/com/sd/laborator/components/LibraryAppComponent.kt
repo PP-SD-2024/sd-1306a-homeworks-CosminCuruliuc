@@ -7,7 +7,7 @@ import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import java.lang.Exception
+import kotlin.Exception
 
 @Component
 class LibraryAppComponent {
@@ -19,6 +19,7 @@ class LibraryAppComponent {
 
     @Autowired
     private lateinit var connectionFactory: RabbitMqConnectionFactoryComponent
+
     private lateinit var amqpTemplate: AmqpTemplate
 
     @Autowired
@@ -35,36 +36,44 @@ class LibraryAppComponent {
     @RabbitListener(queues = ["\${libraryapp.rabbitmq.queue}"])
     fun recieveMessage(msg: String) {
         // the result needs processing
-        val processedMsg = (msg.split(",").map { it.toInt().toChar() }).joinToString(separator="")
+        val processedMsg = (msg.split(",").map { it.toInt().toChar() }).joinToString(separator = "")
         try {
-            val (function, parameter) = processedMsg.split(":")
-            val result: String? = when(function) {
-                "print" -> customPrint(parameter)
-                "find" -> customFind(parameter)
-                else -> null
+            var format = ""
+            var findBy = ""
+            for (line in processedMsg.lines()) {
+                val (function, parameter) = line.split(":")
+                when (function) {
+                    "print" -> format = parameter
+                    "find" -> findBy = parameter
+                }
             }
-            if (result != null) sendMessage(result)
+            val result = getBooksByFormat(format, findBy)
+            sendMessage(result)
         } catch (e: Exception) {
             println(e)
         }
     }
 
-    fun customPrint(format: String): String {
+    private fun getBooksByFormat(format: String, findBy: String): String {
+        var books: Set<Book>? = null
+        if(findBy.isNotEmpty()) {
+            val (field, value) = findBy.split("=")
+            books = when(field) {
+                "author" -> libraryDAO.findAllByAuthor(value)
+                "title" -> libraryDAO.findAllByTitle(value)
+                "publisher" -> libraryDAO.findAllByPublisher(value)
+                else -> null
+            }
+        }
+        if(books == null) {
+            books = libraryDAO.getBooks()
+        }
+
         return when(format) {
             "html" -> libraryPrinter.printHTML(libraryDAO.getBooks())
             "json" -> libraryPrinter.printJSON(libraryDAO.getBooks())
             "raw" -> libraryPrinter.printRaw(libraryDAO.getBooks())
             else -> "Not implemented"
-        }
-    }
-
-    fun customFind(searchParameter: String): String {
-        val (field, value) = searchParameter.split("=")
-        return when(field) {
-            "author" -> this.libraryPrinter.printJSON(this.libraryDAO.findAllByAuthor(value))
-            "title" -> this.libraryPrinter.printJSON(this.libraryDAO.findAllByTitle(value))
-            "publisher" -> this.libraryPrinter.printJSON(this.libraryDAO.findAllByPublisher(value))
-            else -> "Not a valid field"
         }
     }
 

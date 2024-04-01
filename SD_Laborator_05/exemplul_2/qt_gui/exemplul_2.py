@@ -34,20 +34,20 @@ class LibraryApp(QWidget):
     def search(self):
         search_string = self.search_bar.text()
         request = None
-        if not search_string:
-            if self.json_rb.isChecked():
-                request = 'print:json'
-            elif self.html_rb.isChecked():
-                request = 'print:html'
-            else:
-                request = 'print:raw'
+        if self.json_rb.isChecked():
+            request = 'print:json'
+        elif self.html_rb.isChecked():
+            request = 'print:html'
         else:
+            request = 'print:raw'
+
+        if search_string:
             if self.author_rb.isChecked():
-                request = 'find:author={}'.format(search_string)
+                request += '\nfind:author={}'.format(search_string)
             elif self.title_rb.isChecked():
-                request = 'find:title={}'.format(search_string)
+                request += '\nfind:title={}'.format(search_string)
             else:
-                request = 'find:publisher={}'.format(search_string)
+                request += '\nfind:publisher={}'.format(search_string)
         self.send_request(request)
 
     def save_as_file(self):
