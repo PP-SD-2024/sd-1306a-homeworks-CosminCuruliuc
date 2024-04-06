@@ -28,20 +28,24 @@ class LibraryApp(QWidget):
     def search(self):
         search_string = self.search_bar.text()
         url = None
+
+        formatPrint = None
+        if self.json_rb.isChecked():
+            formatPrint = 'json'
+        elif self.html_rb.isChecked():
+            formatPrint = 'html'
+        else:
+            formatPrint = 'raw'
+
         if not search_string:
-            if self.json_rb.isChecked():
-                url = '/print?format=json'
-            elif self.html_rb.isChecked():
-                url = '/print?format=html'
-            else:
-                url = '/print?format=raw'
+            url = '/print?format={}'.format(formatPrint)
         else:
             if self.author_rb.isChecked():
-                url = '/find?author={}'.format(search_string.replace(' ', '%20'))
+                url = '/find_and_print?format={}&author={}'.format(formatPrint, search_string.replace(' ', '%20'))
             elif self.title_rb.isChecked():
-                url = '/find?title={}'.format(search_string.replace(' ', '%20'))
+                url = '/find_and_print?format={}&title={}'.format(formatPrint, search_string.replace(' ', '%20'))
             else:
-                url = '/find?publisher={}'.format(search_string.replace(' ', '%20'))
+                url = '/find_and_print?format={}&publisher={}'.format(formatPrint, search_string.replace(' ', '%20'))
         full_url = "http://localhost:8080" + url
         try:
             response = requests.get(full_url)
