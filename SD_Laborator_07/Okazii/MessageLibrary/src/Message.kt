@@ -1,28 +1,32 @@
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Message private constructor(val sender: String, val body: String, val timestamp: Date) {
+class Message private constructor(val sender: String, val body: String, val timestamp: Date, val name: String = "-", val telephone : String = "-", val email: String = "-") : Comparable<Message>{
     companion object {
-        fun create(sender: String, body: String): Message {
-            return Message(sender, body, Date())
+        operator fun <T> List<T>.component6() = this[5]
+
+        fun create(sender: String,body: String, name: String = "-", telephone: String = "-", email: String = "-"): Message {
+            return Message(sender, body, Date(), name, telephone, email)
         }
 
         fun deserialize(msg: ByteArray): Message {
             val msgString = String(msg)
-            val (timestamp, sender, body) = msgString.split(' ', limit = 3)
+            val (timestamp, sender, name, telephone, email, body) = msgString.split("_&_", limit = 6)
 
-            return Message(sender, body, Date(timestamp.toLong()))
+            return Message(sender, body, Date(timestamp.toLong()), name, telephone, email)
         }
     }
 
     fun serialize(): ByteArray {
-        return "${timestamp.time} $sender $body\n".toByteArray()
+        return "${timestamp.time}_&_${sender}_&_${name}_&_${telephone}_&_${email}_&_${body}\n".toByteArray()
     }
 
     override fun toString(): String {
         val dateString = SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp)
-        return "[$dateString] $sender >>> $body"
+        return "[$dateString] $sender {Name : $name, Telephone : $telephone, email : $email} >>> $body"
     }
+
+    override fun compareTo(other: Message): Int = this.timestamp.compareTo(other.timestamp)
 }
 
 fun main(args: Array<String>) {

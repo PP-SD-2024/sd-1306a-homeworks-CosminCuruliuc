@@ -1,6 +1,7 @@
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import logging.Logging
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.ServerSocket
@@ -14,18 +15,24 @@ class MessageProcessorMicroservice {
     private var auctioneerConnection:Socket
     private var receiveInQueueObservable: Observable<String>
     private val subscriptions = CompositeDisposable()
-    private val messageQueue: Queue<Message> = LinkedList<Message>()
+    private var messageQueue: MutableList<Message> = LinkedList<Message>()
 
     companion object Constants {
         const val MESSAGE_PROCESSOR_PORT = 1600
         const val BIDDING_PROCESSOR_HOST = "localhost"
         const val BIDDING_PROCESSOR_PORT = 1700
+        const val logPath = "messageProcessorLog.log"
+        val logger = Logging.instance
     }
 
     init {
         messageProcessorSocket = ServerSocket(MESSAGE_PROCESSOR_PORT)
         println("MessageProcessorMicroservice se executa pe portul: ${messageProcessorSocket.localPort}")
         println("Se asteapta mesaje pentru procesare...")
+
+        logger.log(logPath, "MessageProcessorMicroservice se executa pe portul: ${messageProcessorSocket.localPort}")
+        logger.log(logPath, "Se asteapta mesaje pentru procesare...")
+
 
         // se asteapta mesaje primite de la AuctioneerMicroservice
         auctioneerConnection = messageProcessorSocket.accept()
@@ -61,20 +68,30 @@ class MessageProcessorMicroservice {
     }
 
     private fun receiveAndProcessMessages() {
+        // se primesc si se adauga in coada mesajele de la AuctioneerMicroservice
         val receiveInQueueSubscription = receiveInQueueObservable
-            .map { Message.deserialize(it.toByteArray()) } // Convertim fiecare String primit intr-un obiect Message.
-            .distinctUntilChanged { a, b -> a.body == b.body } // Filtram duplicatele bazat pe continutul mesajului.
-            .toList() // Convertim fluxul de date intr-o lista pentru a putea aplica sortarea.
             .subscribeBy(
-                onSuccess = { messages ->
-                    // Sortam mesajele in functie de timestamp.
-                    val sortedMessages = messages.sortedBy { it.timestamp }
-                    messageQueue.addAll(sortedMessages)
+                onNext = {
+                    val message = Message.deserialize(it.toByteArray())
+                    println(message)
+                    messageQueue.add(message)
+                },
+                onComplete = {
+                    // s-a incheiat primirea tuturor mesajelor
+                    println("Procesare / sortare/ filtrare lista mesaje")
+                    logger.log(logPath, "Procesare / sortare/ filtrare lista mesaje")
 
-                    println("Mesaje primite și procesate:")
-                    sortedMessages.forEach { println(it) }
+                    messageQueue = (messageQueue.distinct().toList().sortedWith(compareBy { it.timestamp }).toMutableList())
+                    // s-au primit toate mesajele de la AuctioneerMicroservice, i se trimite un mesaj pentru a semnala
+                    // acest lucru
+                    val finishedMessagesMessage = Message.create(
+                        "${auctioneerConnection.localAddress}:${auctioneerConnection.localPort}",
+                        "am primit tot"
+                    )
+                    auctioneerConnection.getOutputStream().write(finishedMessagesMessage.serialize())
+                    auctioneerConnection.close()
 
-                    // Continuam cu trimiterea mesajelor procesate catre BiddingProcessor.
+                    // se trimit mai departe mesajele procesate catre BiddingProcessor
                     sendProcessedMessages()
                 },
                 onError = { println("Eroare: $it") }
@@ -82,15 +99,17 @@ class MessageProcessorMicroservice {
         subscriptions.add(receiveInQueueSubscription)
     }
 
-
     private fun sendProcessedMessages() {
         try {
             biddingProcessorSocket = Socket(BIDDING_PROCESSOR_HOST, BIDDING_PROCESSOR_PORT)
 
             println("Trimit urmatoarele mesaje:")
+            logger.log(logPath, "Trimit urmatoarele mesaje:")
+
             Observable.fromIterable(messageQueue).subscribeBy(
                 onNext = {
                     println(it.toString())
+                    logger.log(logPath, it.toString())
 
                     // trimitere mesaje catre procesorul licitatiei, care decide rezultatul final
                     biddingProcessorSocket.getOutputStream().write(it.serialize())
@@ -109,6 +128,8 @@ class MessageProcessorMicroservice {
             )
         } catch (e: Exception) {
             println("Nu ma pot conecta la BiddingProcessor!")
+            logger.log(logPath, "Nu ma pot conecta la BiddingProcessor!")
+
             messageProcessorSocket.close()
             exitProcess(1)
         }
