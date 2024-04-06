@@ -61,35 +61,27 @@ class MessageProcessorMicroservice {
     }
 
     private fun receiveAndProcessMessages() {
-        // se primesc si se adauga in coada mesajele de la AuctioneerMicroservice
         val receiveInQueueSubscription = receiveInQueueObservable
-            ///TODO --- filtrati duplicatele folosind operatorul de filtrare
+            .map { Message.deserialize(it.toByteArray()) } // Convertim fiecare String primit intr-un obiect Message.
+            .distinctUntilChanged { a, b -> a.body == b.body } // Filtram duplicatele bazat pe continutul mesajului.
+            .toList() // Convertim fluxul de date intr-o lista pentru a putea aplica sortarea.
             .subscribeBy(
-                onNext = {
-                    val message = Message.deserialize(it.toByteArray())
-                    println(message)
-                    messageQueue.add(message)
-                },
-                onComplete = {
-                    // s-a incheiat primirea tuturor mesajelor
-                    ///TODO --- se ordoneaza in functie de data si ora cand mesajele au fost primite
+                onSuccess = { messages ->
+                    // Sortam mesajele in functie de timestamp.
+                    val sortedMessages = messages.sortedBy { it.timestamp }
+                    messageQueue.addAll(sortedMessages)
 
-                    // s-au primit toate mesajele de la AuctioneerMicroservice, i se trimite un mesaj pentru a semnala
-                    // acest lucru
-                    val finishedMessagesMessage = Message.create(
-                        "${auctioneerConnection.localAddress}:${auctioneerConnection.localPort}",
-                        "am primit tot"
-                    )
-                    auctioneerConnection.getOutputStream().write(finishedMessagesMessage.serialize())
-                    auctioneerConnection.close()
+                    println("Mesaje primite și procesate:")
+                    sortedMessages.forEach { println(it) }
 
-                    // se trimit mai departe mesajele procesate catre BiddingProcessor
+                    // Continuam cu trimiterea mesajelor procesate catre BiddingProcessor.
                     sendProcessedMessages()
                 },
                 onError = { println("Eroare: $it") }
             )
         subscriptions.add(receiveInQueueSubscription)
     }
+
 
     private fun sendProcessedMessages() {
         try {
