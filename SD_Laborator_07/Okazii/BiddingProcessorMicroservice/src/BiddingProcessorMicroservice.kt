@@ -1,6 +1,7 @@
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import logging.Logging
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.ServerSocket
@@ -19,12 +20,17 @@ class BiddingProcessorMicroservice {
         const val BIDDING_PROCESSOR_PORT = 1700
         const val AUCTIONEER_PORT = 1500
         const val AUCTIONEER_HOST = "localhost"
+        const val logPath = "biddingLog.log"
+        val logger = Logging.instance
     }
 
     init {
         biddingProcessorSocket = ServerSocket(BIDDING_PROCESSOR_PORT)
         println("BiddingProcessorMicroservice se executa pe portul: ${biddingProcessorSocket.localPort}")
         println("Se asteapta ofertele pentru finalizarea licitatiei...")
+        logger.log(logPath, "BiddingProcessorMicroservice se executa pe portul: ${biddingProcessorSocket.localPort}")
+        logger.log(logPath, "Se asteapta ofertele pentru finalizarea licitatiei...")
+
 
         // se asteapta mesaje primite de la MessageProcessorMicroservice
         val messageProcessorConnection = biddingProcessorSocket.accept()
@@ -76,6 +82,8 @@ class BiddingProcessorMicroservice {
                 onNext = {
                     val message = Message.deserialize(it.toByteArray())
                     println(message)
+                    logger.log(logPath, message.toString())
+
                     processedBidsQueue.add(message)
                 },
                 onComplete = {
@@ -96,7 +104,9 @@ class BiddingProcessorMicroservice {
             it.body.split(" ")[1].toInt()
         }
 
-        println("Castigatorul este: ${winner?.sender}")
+        println("Castigatorul este: ${winner?.sender} (Nume : ${winner?.name})")
+        logger.log(logPath, "Castigatorul este: ${winner?.sender} (Nume : ${winner?.name})")
+
 
         try {
             auctioneerSocket = Socket(AUCTIONEER_HOST, AUCTIONEER_PORT)
@@ -106,8 +116,12 @@ class BiddingProcessorMicroservice {
             auctioneerSocket.close()
 
             println("Am anuntat castigatorul catre AuctioneerMicroservice.")
+            logger.log(logPath, "Am anuntat castigatorul catre AuctioneerMicroservice.")
+
         } catch (e: Exception) {
             println("Nu ma pot conecta la Auctioneer!")
+            logger.log(logPath, "Nu ma pot conecta la Auctioneer!")
+
             biddingProcessorSocket.close()
             exitProcess(1)
         }
